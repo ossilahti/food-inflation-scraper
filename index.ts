@@ -1,13 +1,14 @@
 import axios from 'axios';
 import cheerio from 'cheerio';
 import dotenv from 'dotenv';
+import moment from 'moment';
 const express = require('express');
 const cors = require('cors');
 const app = express();
 app.use(cors());
 dotenv.config();
 
-export class Prices {
+class Prices {
     milkUrl: string;
     cheeseUrl: string;
     constructor() {
@@ -68,10 +69,28 @@ export class Prices {
     }
 }
 
+class PriceHistory {
+    constructor() {
+        //
+    }
+
+    getDate() {
+        let date = new Date(); 
+        let formattedDate = (moment(date)).format('D.M.YYYY'); // Finnish format
+        return formattedDate; 
+    }
+
+    activate() {
+        this.getDate();
+    }
+}
+
 function activateViewModel() {
     app.listen(process.env.PORT, () => console.log(`server running on PORT ${process.env.PORT}`));
     const priceClass = new Prices();
+    const history = new PriceHistory();
     priceClass.activate();
+    history.activate();
 }
 
 activateViewModel();
