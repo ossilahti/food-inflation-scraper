@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "name": "food-price-inflation-scraper",
   "version": "1.0.0",
   "description": "",
