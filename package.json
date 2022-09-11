@@ -1,11 +1,10 @@
 {
-  "type": "module",
   "name": "food-price-inflation-scraper",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "nodemon index.ts"
   },
   "author": "",
   "license": "ISC",
