@@ -1,14 +1,13 @@
 import axios from 'axios';
 import cheerio from 'cheerio';
-import dotenv from 'dotenv';
 import moment from 'moment';
+const { appendFile, readFile } = require('fs/promises');
 const express = require('express');
 const cors = require('cors');
 const app = express();
 app.use(cors());
-dotenv.config();
 
-class Prices {
+class Products {
     milkUrl: string;
     cheeseUrl: string;
     constructor() {
@@ -35,62 +34,56 @@ class Prices {
      * @returns Object array of title and price - returns it in json to server
      */
     fetchPriceData(data: any, parentClass: string, titleClass: string, priceClass: string) {
-        let priceDetails: { title: string, price: string} [] = [];
+        let priceDetails: { title: string, price: string, date: string } [] = [];
         const $ = cheerio.load(data);
         $(parentClass, data).each((i) => { 
             priceDetails[0] = {
                 title: $(titleClass).text(),
-                price: $(priceClass).text()
+                price: $(priceClass).text(),
+                date: this.getDate()
             };
         });
 
         return priceDetails;
     }
 
-    getMilkPrice() {
-        app.get('/milk', async (req: any, res: any) => {
-            const response = await this.getDetails(this.milkUrl);
-            const milkPrice = this.fetchPriceData(response, '.ant-row', '.sc-618c7756-0', '.sc-d1a120d4-0');
-            res.json(milkPrice);
-        });
+    async saveMilkPrice() {
+        const response = await this.getDetails(this.milkUrl);
+        const milkPrice = this.fetchPriceData(response, '.ant-row', '.sc-618c7756-0', '.sc-d1a120d4-0');
+        const jsonData = JSON.stringify(milkPrice, null, 2);
+        this.saveData('data/milk.json', jsonData);
     }
 
-    getCheesePrice() {
-        app.get('/cheese', async (req: any, res: any) => {
-            const response = await this.getDetails(this.cheeseUrl);
-            const cheesePrice = this.fetchPriceData(response, '.sc-76652cbd-2', '.sc-618c7756-0', '.sc-d1a120d4-0');
-            res.json(cheesePrice);
-        });
+    async saveCheesePrice() {
+        const response = await this.getDetails(this.cheeseUrl);
+        const cheesePrice = this.fetchPriceData(response, '.sc-76652cbd-2', '.sc-618c7756-0', '.sc-d1a120d4-0');
+        const jsonData = JSON.stringify(cheesePrice, null, 2);
+        this.saveData('data/cheese.json', jsonData);
     }
 
-    activate() {
-        this.getMilkPrice();
-        this.getCheesePrice();
-    }
-}
-
-class PriceHistory {
-    constructor() {
-        //
-    }
-
+    /**
+     * Gets today's date
+     * @returns Finnish-formatted date
+     */
     getDate() {
         let date = new Date(); 
         let formattedDate = (moment(date)).format('D.M.YYYY'); // Finnish format
         return formattedDate; 
     }
 
+    saveData(file: any, data: any) {
+        appendFile(file, data, () => {});
+    }
+
     activate() {
-        this.getDate();
+        this.saveMilkPrice();
+        this.saveCheesePrice();
     }
 }
 
 function activateViewModel() {
-    app.listen(process.env.PORT, () => console.log(`server running on PORT ${process.env.PORT}`));
-    const priceClass = new Prices();
-    const history = new PriceHistory();
+    const priceClass = new Products();
     priceClass.activate();
-    history.activate();
 }
 
 activateViewModel();
