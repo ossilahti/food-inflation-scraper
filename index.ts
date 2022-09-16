@@ -47,6 +47,9 @@ class Products {
         return priceDetails;
     }
 
+    /**
+     * Fetches milk price from html and saves it to a .json-file
+     */
     async saveMilkPrice() {
         const response = await this.getDetails(this.milkUrl);
         const milkPrice = this.fetchPriceData(response, '.ant-row', '.sc-618c7756-0', '.sc-d1a120d4-0');
@@ -54,6 +57,9 @@ class Products {
         this.saveData('data/milk.json', jsonData);
     }
 
+    /**
+     * Fetches cheese price from html and saves it to a .json-file
+     */
     async saveCheesePrice() {
         const response = await this.getDetails(this.cheeseUrl);
         const cheesePrice = this.fetchPriceData(response, '.sc-76652cbd-2', '.sc-618c7756-0', '.sc-d1a120d4-0');
@@ -71,6 +77,11 @@ class Products {
         return formattedDate; 
     }
 
+    /**
+     * Saves data to given json file
+     * @param file File where the json is saved 
+     * @param data Data which is saved
+     */
     saveData(file: any, data: any) {
         appendFile(file, data, () => {});
     }
