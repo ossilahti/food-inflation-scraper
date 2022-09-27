@@ -1,7 +1,7 @@
 import axios from 'axios';
 import cheerio from 'cheerio';
 import moment from 'moment';
-const { appendFile, readFile } = require('fs/promises');
+const { readFileSync, writeFileSync } = require('fs');
 const express = require('express');
 const cors = require('cors');
 const app = express();
@@ -53,8 +53,7 @@ class Products {
     async saveMilkPrice() {
         const response = await this.getDetails(this.milkUrl);
         const milkPrice = this.fetchPriceData(response, '.ant-row', '.sc-618c7756-0', '.sc-d1a120d4-0');
-        const jsonData = JSON.stringify(milkPrice, null, 2);
-        this.saveData('data/milk.json', jsonData);
+        this.saveData('data/milk.json', milkPrice[0]);
     }
 
     /**
@@ -63,8 +62,7 @@ class Products {
     async saveCheesePrice() {
         const response = await this.getDetails(this.cheeseUrl);
         const cheesePrice = this.fetchPriceData(response, '.sc-76652cbd-2', '.sc-618c7756-0', '.sc-d1a120d4-0');
-        const jsonData = JSON.stringify(cheesePrice, null, 2);
-        this.saveData('data/cheese.json', jsonData);
+        this.saveData('data/cheese.json', cheesePrice[0]);
     }
 
     /**
@@ -80,10 +78,20 @@ class Products {
     /**
      * Saves data to given json file
      * @param file File where the json is saved 
-     * @param data Data which is saved
+     * @param save Data which is saved
      */
     saveData(file: any, data: any) {
-        appendFile(file, data, () => {});
+        // Read content of file
+        const jsonData = readFileSync(file);
+        let fileObject = JSON.parse(jsonData);
+
+        // Save new data to the file object
+        fileObject.push(data);
+
+        // Write to the file
+        const newData = JSON.stringify(fileObject, null, 2);
+        writeFileSync(file, newData);
+        console.log(newData)
     }
 
     activate() {
