@@ -1,7 +1,6 @@
 import axios from 'axios';
 import cheerio from 'cheerio';
 import moment from 'moment';
-import { it } from 'node:test';
 const { readFileSync, writeFileSync } = require('fs');
 const express = require('express');
 const cors = require('cors');
@@ -27,9 +26,6 @@ class Products {
     /**
      * Iterates through html data by class names
      * @param url The url where the data is fetched
-     * @param parentClass The parent element in html - under this is found the price details
-     * @param titleClass Under this class is the text of the product title
-     * @param priceClass Under this class is the text of the product price
      * @returns Object array of title and price - returns it in json to server
      */
     async fetchPriceData(url: any) {
@@ -72,7 +68,7 @@ class Products {
     /**
      * Saves data to given json file
      * @param file File where the json is saved 
-     * @param save Data which is saved
+     * @param data Data which is saved
      */
     writeToFile(file: any, data: any) {
         // Read content of file
