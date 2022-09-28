@@ -1,6 +1,7 @@
 import axios from 'axios';
 import cheerio from 'cheerio';
 import moment from 'moment';
+import { it } from 'node:test';
 const { readFileSync, writeFileSync } = require('fs');
 const express = require('express');
 const cors = require('cors');
@@ -8,20 +9,11 @@ const chalk = require('chalk');
 const app = express();
 app.use(cors());
 
-class Products {
-    urlArray: any;
-    constructor() {
-        this.urlArray = {
-            milk: 'https://www.s-kaupat.fi/tuote/valio-vapaan-lehman-kevytmaito-1-l/6408430000128',
-            cheese: 'https://www.s-kaupat.fi/tuote/valio-oltermannir-17-e900-g/6408430039517',
-            butter: 'https://www.s-kaupat.fi/tuote/valio-oivariinir-550-g-vaharasvaisempi-valsar-hylar/6408430310890',
-            bread: 'https://www.s-kaupat.fi/tuote/vaasan-ruispalat-330-g-6-kpl-revitty-taysjyvaruisleipa/6437005003752',
-            rice: 'https://www.s-kaupat.fi/tuote/risella-jasmiiniriisi-1kg/8410184027809',
-            chicken: '',
-            meat: '',
-        };
-    }
+interface UrlArray<T> {
+    readonly [n: string]: T;
+}
 
+class Products {
     /**
      * Gets the html data and makes it readable
      * @param url The url for what product the data is fetched
@@ -40,14 +32,14 @@ class Products {
      * @param priceClass Under this class is the text of the product price
      * @returns Object array of title and price - returns it in json to server
      */
-    async fetchPriceData(url: string, parentClass: string, titleClass: string, priceClass: string) {
+    async fetchPriceData(url: any) {
         const response = await this.getDetails(url);
         let priceDetails: { title: string, price: string, date: string } [] = [];
         const $ = cheerio.load(response);
-        $(parentClass, response).each((i) => { 
+        $('.sc-76652cbd-2', response).each((i) => { 
             priceDetails[0] = {
-                title: $(titleClass).text(),
-                price: $(priceClass).text(),
+                title: $('.sc-618c7756-0').text(),
+                price: $('.sc-d1a120d4-0').text(),
                 date: this.getDate()
             };
         });
@@ -59,12 +51,12 @@ class Products {
     /**
      * Fetches milk price from html and saves it to a .json-file
      */
-    onSave(arrayOfProducts: any) {
-        this.writeToFile('data/milk.json', arrayOfProducts[0]);
-        this.writeToFile('data/cheese.json', arrayOfProducts[1]);
-        this.writeToFile('data/butter.json', arrayOfProducts[2]);
-        this.writeToFile('data/bread.json', arrayOfProducts[3]);
-        this.writeToFile('data/rice.json', arrayOfProducts[4]);
+    onSave(products: any, urls: any) {
+        let i = 0;
+        for (const [key, value] of Object.entries(urls)) {
+            this.writeToFile(`data/${key}.json`, products[i]);
+            i++;
+        }
     }
 
     /**
@@ -96,14 +88,24 @@ class Products {
     }
 
     async activate() {
+        const urls: UrlArray<string> = {
+            milk: 'https://www.s-kaupat.fi/tuote/valio-vapaan-lehman-kevytmaito-1-l/6408430000128',
+            cheese: 'https://www.s-kaupat.fi/tuote/valio-oltermannir-17-e900-g/6408430039517',
+            butter: 'https://www.s-kaupat.fi/tuote/valio-oivariinir-550-g-vaharasvaisempi-valsar-hylar/6408430310890',
+            bread: 'https://www.s-kaupat.fi/tuote/vaasan-ruispalat-330-g-6-kpl-revitty-taysjyvaruisleipa/6437005003752',
+            rice: 'https://www.s-kaupat.fi/tuote/risella-jasmiiniriisi-1kg/8410184027809',
+            chicken: 'https://www.s-kaupat.fi/tuote/kariniemen-kananpojan-fileesuikale-hunaja-450-g/6407720025070',
+            meat: 'https://www.s-kaupat.fi/tuote/atria-parempi-nauta-jauheliha-10-400g/6407840041172',
+        };
+
+        const products: any = [];
         console.log('Saved prices of the following products:');
-        const milkPrice = await this.fetchPriceData(this.urlArray.milk, '.sc-76652cbd-2', '.sc-618c7756-0', '.sc-d1a120d4-0');
-        const cheesePrice = await this.fetchPriceData(this.urlArray.cheese, '.sc-76652cbd-2', '.sc-618c7756-0', '.sc-d1a120d4-0');
-        const butterPrice = await this.fetchPriceData(this.urlArray.butter, '.sc-76652cbd-2', '.sc-618c7756-0', '.sc-d1a120d4-0');
-        const breadPrice = await this.fetchPriceData(this.urlArray.bread, '.sc-76652cbd-2', '.sc-618c7756-0', '.sc-d1a120d4-0');
-        const ricePrice = await this.fetchPriceData(this.urlArray.rice, '.sc-76652cbd-2', '.sc-618c7756-0', '.sc-d1a120d4-0');
-        const arrayOfProducts = [ milkPrice, cheesePrice, butterPrice, breadPrice, ricePrice ];
-        this.onSave(arrayOfProducts);
+
+        for (const [key, value] of Object.entries(urls)) {
+            products.push(await this.fetchPriceData(value))
+        }
+
+        this.onSave(products, urls);
         console.log(chalk.green('Successfully saved to a file.'))
     }
 }
