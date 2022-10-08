@@ -35,7 +35,7 @@ class Products {
         $('.sc-76652cbd-2', response).each((i) => { 
             priceDetails[0] = {
                 title: $('.sc-618c7756-0').text(),
-                price: $('.sc-d1a120d4-0').text(),
+                price: $('.sc-67cf5218-0').text(),
                 date: this.getDate()
             };
         });
@@ -92,6 +92,14 @@ class Products {
             rice: 'https://www.s-kaupat.fi/tuote/risella-jasmiiniriisi-1kg/8410184027809',
             chicken: 'https://www.s-kaupat.fi/tuote/kariniemen-kananpojan-fileesuikale-hunaja-450-g/6407720025070',
             meat: 'https://www.s-kaupat.fi/tuote/atria-parempi-nauta-jauheliha-10-400g/6407840041172',
+            eggs: 'https://www.s-kaupat.fi/tuote/farmimuna-348g-m6-vapaa-gmo-vapaa-kananmuna/6419742348600',
+            coffee: 'https://www.s-kaupat.fi/tuote/paulig-juhla-mokka-kahvi-suodatinjauhatus-500g/6411300000494',
+            ketchup: 'https://www.s-kaupat.fi/tuote/felix-ketchup-1250g/7310240651881',
+            oats: 'https://www.s-kaupat.fi/tuote/elovena-1kg-taysjyva-kaurahiutale/6416597113919',
+            salad: 'https://www.s-kaupat.fi/tuote/kotimaista-100g-suomalainen-jaasalaatti-pakattu/6414894500135',
+            cucumber: 'https://www.s-kaupat.fi/tuote/kurkku-suomi/2000604700007',
+            feta: 'https://www.s-kaupat.fi/tuote/apetina-200g-3-valimerellinen-vahalaktoosinen-juusto-kuutioina/5760466754712',
+            pineapple: 'https://www.s-kaupat.fi/tuote/227139g-dole-tropical-gold-ananaspaloja-mehussa/0038900014261'
         };
 
         const products: any = [];
